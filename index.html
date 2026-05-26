@@ -1,0 +1,1740 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>黄小璨 AI · 两周运营与产品迭代总结</title>
+<style>
+  :root {
+    --gold: #F5D060;
+    --gold-deep: #B89500;
+    --gold-dark: #8B7200;
+    --cream: #FDF8E7;
+    --cream-soft: #FFF9E6;
+    --text-primary: #1d1d1f;
+    --text-secondary: #6e6e73;
+    --text-tertiary: #86868b;
+    --bg-white: #ffffff;
+    --bg-light: #fafafa;
+    --bg-section: #f5f5f7;
+    --border: rgba(0,0,0,0.06);
+    --card-radius: 24px;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.04);
+    --shadow-md: 0 4px 20px rgba(0,0,0,0.06);
+    --shadow-lg: 0 12px 40px rgba(0,0,0,0.08);
+    --shadow-xl: 0 20px 60px rgba(0,0,0,0.1);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text",
+      "Helvetica Neue", "PingFang SC", "Noto Sans CJK SC", sans-serif;
+    color: var(--text-primary);
+    background: var(--bg-white);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* ── Global utilities ── */
+  .container { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+  .container-narrow { max-width: 800px; margin: 0 auto; padding: 0 24px; }
+
+  /* ══════════════════════════════════════════
+     HERO — Full-viewport immersive hero
+     ══════════════════════════════════════════ */
+  .hero {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(170deg, #1a1a1a 0%, #2d2520 40%, #3a2e1e 100%);
+    overflow: hidden;
+    padding: 60px 24px;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 80% 60% at 50% 40%, rgba(245,208,96,0.12) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    max-width: 800px;
+  }
+  .hero-avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid rgba(245,208,96,0.4);
+    box-shadow: 0 0 60px rgba(245,208,96,0.15);
+    margin-bottom: 32px;
+  }
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(245,208,96,0.12);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(245,208,96,0.2);
+    color: var(--gold);
+    font-size: 13px;
+    font-weight: 500;
+    padding: 8px 18px;
+    border-radius: 100px;
+    letter-spacing: 0.3px;
+    margin-bottom: 28px;
+  }
+  .hero h1 {
+    font-size: clamp(36px, 6vw, 64px);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    color: #ffffff;
+    margin-bottom: 20px;
+  }
+  .hero h1 .gold { color: var(--gold); }
+  .hero .subtitle {
+    font-size: clamp(17px, 2.5vw, 22px);
+    color: rgba(255,255,255,0.6);
+    max-width: 600px;
+    margin: 0 auto 36px;
+    line-height: 1.5;
+    font-weight: 400;
+  }
+  .hero .date-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 24px;
+    background: rgba(255,255,255,0.06);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 100px;
+    font-size: 14px;
+    color: rgba(255,255,255,0.5);
+    font-weight: 400;
+  }
+  .hero-scroll-hint {
+    position: absolute;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    color: rgba(255,255,255,0.3);
+    font-size: 12px;
+    letter-spacing: 1px;
+    animation: gentleBounce 2s ease-in-out infinite;
+  }
+  @keyframes gentleBounce {
+    0%, 100% { transform: translateX(-50%) translateY(0); }
+    50% { transform: translateX(-50%) translateY(6px); }
+  }
+
+  /* ══════════════════════════════════════════
+     SECTIONS — Apple-style generous spacing
+     ══════════════════════════════════════════ */
+  .section {
+    padding: 120px 0;
+    position: relative;
+  }
+  .section-cream { background: var(--cream); }
+  .section-light { background: var(--bg-section); }
+  .section-dark {
+    background: linear-gradient(180deg, #1a1a1a 0%, #252525 100%);
+    color: #fff;
+  }
+
+  .section-label {
+    display: inline-block;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    color: var(--gold-deep);
+    margin-bottom: 12px;
+  }
+  .section-dark .section-label { color: var(--gold); }
+  .section-title {
+    font-size: clamp(32px, 5vw, 52px);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1.15;
+    margin-bottom: 20px;
+  }
+  .section-desc {
+    font-size: clamp(17px, 2vw, 20px);
+    color: var(--text-secondary);
+    max-width: 640px;
+    line-height: 1.65;
+    margin-bottom: 64px;
+    font-weight: 400;
+  }
+  .section-dark .section-desc { color: rgba(255,255,255,0.5); }
+
+  /* ══════════════════════════════════════════
+     FDE SECTION — Deep dive + Paradigm
+     ══════════════════════════════════════════ */
+
+  /* FDE explainer subsection */
+  .fde-explainer {
+    margin-bottom: 80px;
+    padding-bottom: 80px;
+    border-bottom: 1px solid var(--border);
+  }
+  .fde-explainer .sub-title {
+    font-size: clamp(24px, 3vw, 32px);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 20px;
+    line-height: 1.3;
+  }
+  .fde-explainer .sub-desc {
+    font-size: 17px;
+    color: var(--text-secondary);
+    line-height: 1.75;
+    max-width: 720px;
+    margin-bottom: 40px;
+  }
+  .fde-explainer .sub-desc strong { color: var(--text-primary); }
+  .fde-explainer .sub-desc .accent { color: var(--gold-deep); font-weight: 600; }
+
+  .fde-data-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-bottom: 48px;
+  }
+  .fde-data-card {
+    background: var(--bg-white);
+    border-radius: var(--card-radius);
+    padding: 32px 24px;
+    box-shadow: var(--shadow-md);
+    text-align: center;
+  }
+  .fde-data-card .big-num {
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--gold-deep);
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+  }
+  .fde-data-card .big-num .sm { font-size: 18px; opacity: 0.6; }
+  .fde-data-card .data-label {
+    font-size: 14px;
+    color: var(--text-tertiary);
+    margin-top: 8px;
+    line-height: 1.4;
+  }
+
+  .fde-role-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+    font-size: 14px;
+    margin: 40px 0;
+  }
+  .fde-role-table thead th {
+    background: var(--gold-deep);
+    color: #fff;
+    font-weight: 600;
+    padding: 14px 16px;
+    text-align: left;
+    font-size: 13px;
+  }
+  .fde-role-table tbody td {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+    line-height: 1.5;
+  }
+  .fde-role-table tbody tr:last-child td { border-bottom: none; }
+  .fde-role-table tbody tr:nth-child(even) { background: var(--cream); }
+  .fde-role-table .col-fde { color: var(--gold-deep); font-weight: 600; }
+
+  .fde-takeaway-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin: 48px 0;
+  }
+  .fde-takeaway {
+    background: var(--cream);
+    border-radius: var(--card-radius);
+    padding: 28px 24px;
+  }
+  .fde-takeaway .num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background: var(--gold);
+    border-radius: 50%;
+    font-size: 14px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 14px;
+  }
+  .fde-takeaway h4 { font-size: 16px; font-weight: 600; margin-bottom: 8px; }
+  .fde-takeaway p { font-size: 14px; color: var(--text-secondary); line-height: 1.6; }
+
+  /* Paradigm / OPC-OPT subsection */
+  .paradigm-sub-header {
+    margin-top: 80px;
+    margin-bottom: 48px;
+  }
+
+  .opc-formula {
+    background: var(--bg-white);
+    border-radius: var(--card-radius);
+    padding: 40px 36px;
+    box-shadow: var(--shadow-md);
+    margin-bottom: 48px;
+  }
+  .opc-formula .formula-title {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 24px;
+    color: var(--gold-deep);
+  }
+  .opc-formula .formula-items {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 24px;
+  }
+  .opc-formula .f-item {
+    background: var(--cream);
+    border-radius: 16px;
+    padding: 16px 20px;
+    text-align: center;
+    min-width: 140px;
+  }
+  .opc-formula .f-item .f-icon { font-size: 28px; margin-bottom: 6px; }
+  .opc-formula .f-item .f-text { font-size: 14px; font-weight: 500; line-height: 1.4; }
+  .opc-formula .f-plus {
+    font-size: 24px;
+    font-weight: 300;
+    color: var(--text-tertiary);
+  }
+  .opc-formula .f-equals {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--gold-deep);
+  }
+  .opc-formula .f-result {
+    background: linear-gradient(135deg, var(--gold) 0%, #E8C840 100%);
+    border-radius: 16px;
+    padding: 16px 24px;
+    text-align: center;
+    min-width: 200px;
+  }
+  .opc-formula .f-result .f-text { font-weight: 700; color: #1a1a1a; }
+
+  .three-systems {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-bottom: 48px;
+  }
+  .system-card {
+    background: var(--bg-white);
+    border-radius: var(--card-radius);
+    padding: 32px 24px;
+    box-shadow: var(--shadow-md);
+    border-left: 4px solid var(--gold);
+    transition: transform 0.3s, box-shadow 0.3s;
+  }
+  .system-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+  }
+  .system-card .sys-icon { font-size: 28px; margin-bottom: 14px; }
+  .system-card h4 { font-size: 17px; font-weight: 600; margin-bottom: 8px; }
+  .system-card p { font-size: 14px; color: var(--text-secondary); line-height: 1.6; }
+
+  .paradigm-intro {
+    font-size: 18px;
+    line-height: 1.8;
+    color: var(--text-secondary);
+    max-width: 720px;
+    margin-bottom: 64px;
+  }
+  .paradigm-intro strong { color: var(--text-primary); font-weight: 600; }
+  .paradigm-intro .accent { color: var(--gold-deep); font-weight: 600; }
+
+  .trend-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-bottom: 80px;
+  }
+  .trend-card {
+    background: var(--bg-white);
+    border-radius: var(--card-radius);
+    padding: 36px 28px;
+    box-shadow: var(--shadow-md);
+    transition: transform 0.4s cubic-bezier(0.25,0.1,0,1), box-shadow 0.4s;
+  }
+  .trend-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+  }
+  .trend-card .emoji {
+    width: 52px; height: 52px;
+    background: var(--cream);
+    border-radius: 16px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 26px;
+    margin-bottom: 20px;
+  }
+  .trend-card h3 { font-size: 19px; font-weight: 600; margin-bottom: 10px; }
+  .trend-card p { font-size: 15px; color: var(--text-secondary); line-height: 1.6; }
+
+  /* Paradigm vision — photo + text split */
+  .paradigm-split {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 64px;
+    align-items: center;
+    margin-bottom: 80px;
+  }
+  .paradigm-photo {
+    position: relative;
+    border-radius: 32px;
+    overflow: hidden;
+    box-shadow: var(--shadow-xl);
+  }
+  .paradigm-photo img {
+    width: 100%;
+    display: block;
+    object-fit: cover;
+    aspect-ratio: 4 / 5;
+  }
+  .paradigm-photo .overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 32px 28px 28px;
+    background: linear-gradient(transparent, rgba(0,0,0,0.7));
+    color: #fff;
+  }
+  .paradigm-photo .overlay .name { font-size: 22px; font-weight: 700; }
+  .paradigm-photo .overlay .role { font-size: 14px; opacity: 0.8; margin-top: 4px; }
+
+  .paradigm-text h3 {
+    font-size: clamp(24px, 3.5vw, 36px);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.25;
+    margin-bottom: 24px;
+  }
+  .paradigm-text p {
+    font-size: 17px;
+    color: var(--text-secondary);
+    line-height: 1.75;
+    margin-bottom: 16px;
+  }
+  .paradigm-text .highlight-quote {
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--text-primary);
+    border-left: 3px solid var(--gold);
+    padding-left: 20px;
+    margin: 28px 0;
+    line-height: 1.65;
+  }
+
+  /* Architecture flow */
+  .arch-flow-modern {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    margin: 64px 0;
+    justify-content: center;
+  }
+  .arch-block {
+    flex: 1;
+    max-width: 300px;
+    padding: 36px 28px;
+    text-align: center;
+    position: relative;
+    border-radius: var(--card-radius);
+  }
+  .arch-block.human {
+    background: var(--bg-white);
+    box-shadow: var(--shadow-md);
+  }
+  .arch-block.ai {
+    background: linear-gradient(135deg, var(--gold) 0%, #E8C840 100%);
+    box-shadow: 0 12px 40px rgba(245,208,96,0.3);
+    z-index: 1;
+    transform: scale(1.05);
+  }
+  .arch-block.users {
+    background: var(--bg-white);
+    box-shadow: var(--shadow-md);
+  }
+  .arch-block .block-label {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    opacity: 0.5;
+    margin-bottom: 8px;
+  }
+  .arch-block.ai .block-label { color: rgba(0,0,0,0.5); }
+  .arch-block .block-name {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .arch-block.ai .block-name { color: #1a1a1a; }
+  .arch-block .block-desc {
+    font-size: 14px;
+    opacity: 0.65;
+    line-height: 1.5;
+  }
+  .arch-block.ai .block-desc { color: rgba(0,0,0,0.6); }
+  .arch-connector {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    flex-shrink: 0;
+  }
+  .arch-connector span {
+    font-size: 24px;
+    color: var(--gold-deep);
+    opacity: 0.4;
+  }
+
+  /* Compare table */
+  .compare-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin: 48px 0;
+  }
+  .compare-row {
+    display: grid;
+    grid-template-columns: 140px 1fr 1fr;
+    gap: 2px;
+    border-radius: 16px;
+    overflow: hidden;
+  }
+  .compare-row.header {
+    font-weight: 600;
+    font-size: 13px;
+    letter-spacing: 0.03em;
+  }
+  .compare-row.header > div {
+    background: var(--gold-deep);
+    color: #fff;
+    padding: 14px 20px;
+  }
+  .compare-row:not(.header) > div {
+    padding: 16px 20px;
+    font-size: 15px;
+    line-height: 1.5;
+  }
+  .compare-row:not(.header) > div:first-child {
+    background: var(--cream);
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--gold-dark);
+  }
+  .compare-row:not(.header) > div:nth-child(2) {
+    background: var(--bg-section);
+    color: var(--text-secondary);
+  }
+  .compare-row:not(.header) > div:nth-child(3) {
+    background: var(--bg-white);
+    color: var(--text-primary);
+    font-weight: 500;
+  }
+
+  /* Callout */
+  .callout-modern {
+    background: var(--cream);
+    border-radius: var(--card-radius);
+    padding: 40px 36px;
+    margin: 56px 0;
+    position: relative;
+    overflow: hidden;
+  }
+  .callout-modern::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: var(--gold);
+    border-radius: 4px 0 0 4px;
+  }
+  .callout-modern .callout-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--gold-deep);
+    letter-spacing: 0.05em;
+    margin-bottom: 12px;
+  }
+  .callout-modern p {
+    font-size: 19px;
+    line-height: 1.7;
+    font-weight: 400;
+  }
+  .callout-modern strong { font-weight: 700; color: var(--text-primary); }
+
+  /* ══════════════════════════════════════════
+     MILESTONES — Timeline
+     ══════════════════════════════════════════ */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+    margin-bottom: 80px;
+  }
+  .stat-block { text-align: center; }
+  .stat-block .number {
+    font-size: clamp(40px, 6vw, 56px);
+    font-weight: 700;
+    color: var(--gold-deep);
+    letter-spacing: -0.03em;
+    line-height: 1;
+  }
+  .stat-block .unit {
+    font-size: 20px;
+    font-weight: 500;
+    opacity: 0.5;
+  }
+  .stat-block .label {
+    font-size: 15px;
+    color: var(--text-tertiary);
+    margin-top: 8px;
+    font-weight: 400;
+  }
+
+  .timeline-modern {
+    position: relative;
+    padding-left: 40px;
+  }
+  .timeline-modern::before {
+    content: '';
+    position: absolute;
+    left: 7px;
+    top: 12px;
+    bottom: 12px;
+    width: 2px;
+    background: linear-gradient(180deg, var(--gold) 0%, var(--cream) 100%);
+  }
+  .tl-item {
+    position: relative;
+    margin-bottom: 48px;
+    padding: 32px;
+    background: var(--bg-white);
+    border-radius: var(--card-radius);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border);
+    transition: box-shadow 0.3s, transform 0.3s;
+  }
+  .tl-item:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateX(4px);
+  }
+  .tl-item:last-child { margin-bottom: 0; }
+  .tl-item::before {
+    content: '';
+    position: absolute;
+    left: -39px;
+    top: 36px;
+    width: 14px;
+    height: 14px;
+    background: var(--gold);
+    border-radius: 50%;
+    border: 3px solid var(--bg-section);
+  }
+  .tl-date {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--gold-deep);
+    margin-bottom: 8px;
+  }
+  .tl-title {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    letter-spacing: -0.01em;
+  }
+  .tl-desc {
+    font-size: 16px;
+    color: var(--text-secondary);
+    line-height: 1.7;
+  }
+  .tl-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 16px;
+  }
+  .tl-tag {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 5px 12px;
+    border-radius: 8px;
+    background: var(--cream);
+    color: var(--gold-deep);
+    letter-spacing: 0.01em;
+  }
+
+  /* ══════════════════════════════════════════
+     DATA — Stats & signals
+     ══════════════════════════════════════════ */
+  .data-hero-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    margin-bottom: 80px;
+  }
+  .data-card {
+    background: rgba(255,255,255,0.06);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: var(--card-radius);
+    padding: 36px 24px;
+    text-align: center;
+    transition: transform 0.3s, border-color 0.3s;
+  }
+  .data-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(245,208,96,0.3);
+  }
+  .data-card .number {
+    font-size: 42px;
+    font-weight: 700;
+    color: var(--gold);
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+  .data-card .number .sm { font-size: 22px; opacity: 0.6; }
+  .data-card .label {
+    font-size: 14px;
+    color: rgba(255,255,255,0.45);
+    margin-top: 10px;
+    font-weight: 400;
+  }
+
+  /* Bar chart */
+  .chart-section { margin: 56px 0; }
+  .chart-title {
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 28px;
+    color: #fff;
+  }
+  .bar-chart-modern {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    max-width: 640px;
+  }
+  .bar-row-modern {
+    display: grid;
+    grid-template-columns: 100px 1fr 60px;
+    align-items: center;
+    gap: 16px;
+  }
+  .bar-row-modern .bar-label {
+    font-size: 14px;
+    color: rgba(255,255,255,0.5);
+    text-align: right;
+    font-weight: 400;
+  }
+  .bar-row-modern .bar-track {
+    height: 36px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+  }
+  .bar-row-modern .bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--gold-deep) 0%, var(--gold) 100%);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 12px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #1a1a1a;
+    min-width: 40px;
+  }
+  .bar-row-modern .bar-value {
+    font-size: 14px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.7);
+    text-align: left;
+  }
+
+  /* Signal cards */
+  .signals-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    margin-top: 64px;
+  }
+  .signal-card {
+    background: rgba(255,255,255,0.04);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: var(--card-radius);
+    padding: 32px 28px;
+    transition: transform 0.3s, border-color 0.3s;
+  }
+  .signal-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(245,208,96,0.2);
+  }
+  .signal-card .signal-icon {
+    width: 44px; height: 44px;
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    margin-bottom: 20px;
+  }
+  .signal-card .signal-icon.gold { background: rgba(245,208,96,0.12); }
+  .signal-card .signal-icon.green { background: rgba(52,199,89,0.12); }
+  .signal-card .signal-icon.blue { background: rgba(0,122,255,0.12); }
+  .signal-card h4 {
+    font-size: 17px;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 8px;
+  }
+  .signal-card p {
+    font-size: 14px;
+    color: rgba(255,255,255,0.5);
+    line-height: 1.6;
+    margin-bottom: 12px;
+  }
+  .signal-card .metric {
+    display: inline-block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--gold);
+    background: rgba(245,208,96,0.1);
+    padding: 4px 12px;
+    border-radius: 8px;
+  }
+
+  /* ══════════════════════════════════════════
+     PRICING
+     ══════════════════════════════════════════ */
+  .pricing-row {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 28px;
+    margin: 56px 0;
+  }
+  .price-card {
+    border-radius: var(--card-radius);
+    padding: 44px 36px;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.3s;
+  }
+  .price-card:hover { transform: translateY(-4px); }
+  .price-card.std {
+    background: var(--bg-white);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-md);
+  }
+  .price-card.pro {
+    background: linear-gradient(150deg, #1a1a1a 0%, #2d2520 50%, #3a2e1e 100%);
+    color: #fff;
+    box-shadow: var(--shadow-xl);
+  }
+  .price-card.pro::before {
+    content: '';
+    position: absolute;
+    top: -40%;
+    right: -20%;
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, rgba(245,208,96,0.12) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .price-badge {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 5px 14px;
+    border-radius: 100px;
+    margin-bottom: 20px;
+    letter-spacing: 0.02em;
+  }
+  .price-card.std .price-badge {
+    background: var(--bg-section);
+    color: var(--text-secondary);
+  }
+  .price-card.pro .price-badge {
+    background: rgba(245,208,96,0.15);
+    color: var(--gold);
+  }
+  .price-name {
+    font-size: 26px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .price-tagline {
+    font-size: 14px;
+    opacity: 0.5;
+    margin-bottom: 24px;
+  }
+  .price-amount {
+    font-size: 44px;
+    font-weight: 700;
+    margin-bottom: 28px;
+    letter-spacing: -0.03em;
+  }
+  .price-card.pro .price-amount { color: var(--gold); }
+  .price-amount .per {
+    font-size: 16px;
+    font-weight: 400;
+    opacity: 0.5;
+  }
+  .price-features {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .price-features li {
+    font-size: 15px;
+    padding-left: 28px;
+    position: relative;
+    line-height: 1.5;
+  }
+  .price-features li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 6px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--cream);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .price-features li::after {
+    content: '✓';
+    position: absolute;
+    left: 3px;
+    top: 4px;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--gold-deep);
+  }
+  .price-card.pro .price-features li::before {
+    background: rgba(245,208,96,0.12);
+  }
+  .price-card.pro .price-features li::after { color: var(--gold); }
+
+  /* ══════════════════════════════════════════
+     ROADMAP
+     ══════════════════════════════════════════ */
+  .roadmap-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin: 56px 0;
+  }
+  .road-card {
+    background: var(--bg-white);
+    border-radius: var(--card-radius);
+    padding: 36px 28px;
+    box-shadow: var(--shadow-md);
+    border-top: 4px solid var(--gold);
+    transition: transform 0.3s, box-shadow 0.3s;
+  }
+  .road-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+  }
+  .road-card .phase {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--gold-deep);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 12px;
+  }
+  .road-card h3 {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    letter-spacing: -0.01em;
+  }
+  .road-card ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .road-card li {
+    font-size: 15px;
+    color: var(--text-secondary);
+    padding-left: 20px;
+    position: relative;
+    line-height: 1.5;
+  }
+  .road-card li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 8px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--gold);
+  }
+
+  /* ══════════════════════════════════════════
+     FOOTER
+     ══════════════════════════════════════════ */
+  .footer {
+    padding: 80px 24px;
+    text-align: center;
+    background: var(--cream);
+  }
+  .footer-brand {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--gold-deep);
+    margin-bottom: 8px;
+  }
+  .footer-text {
+    font-size: 14px;
+    color: var(--text-tertiary);
+  }
+  .footer-divider {
+    width: 40px;
+    height: 3px;
+    background: var(--gold);
+    border-radius: 2px;
+    margin: 20px auto;
+    opacity: 0.6;
+  }
+
+  /* ══════════════════════════════════════════
+     ANIMATION
+     ══════════════════════════════════════════ */
+  .fade-up {
+    opacity: 0;
+    transform: translateY(30px);
+    animation: fadeUp 0.9s cubic-bezier(0.25,0.1,0,1) forwards;
+  }
+  @keyframes fadeUp {
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .delay-1 { animation-delay: 0.1s; }
+  .delay-2 { animation-delay: 0.2s; }
+  .delay-3 { animation-delay: 0.3s; }
+  .delay-4 { animation-delay: 0.4s; }
+  .delay-5 { animation-delay: 0.5s; }
+
+  /* ══════════════════════════════════════════
+     RESPONSIVE
+     ══════════════════════════════════════════ */
+  @media (max-width: 1024px) {
+    .paradigm-split { grid-template-columns: 1fr; gap: 40px; }
+    .paradigm-photo { max-width: 400px; margin: 0 auto; }
+    .trend-grid { grid-template-columns: 1fr 1fr; }
+    .fde-data-grid { grid-template-columns: repeat(3, 1fr); }
+    .fde-takeaway-grid { grid-template-columns: 1fr 1fr; }
+    .three-systems { grid-template-columns: 1fr 1fr; }
+  }
+
+  @media (max-width: 768px) {
+    .section { padding: 80px 0; }
+    .hero { min-height: auto; padding: 100px 24px 80px; }
+    .hero h1 { font-size: 36px; }
+
+    .trend-grid { grid-template-columns: 1fr; }
+    .fde-data-grid { grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+    .fde-takeaway-grid { grid-template-columns: 1fr; }
+    .three-systems { grid-template-columns: 1fr; }
+    .fde-role-table { font-size: 12px; }
+    .fde-role-table thead th, .fde-role-table tbody td { padding: 10px 10px; }
+    .opc-formula .formula-items { gap: 10px; }
+    .opc-formula .f-item { min-width: 100px; padding: 12px 14px; }
+    .stats-row { grid-template-columns: repeat(2, 1fr); gap: 20px; }
+    .data-hero-grid { grid-template-columns: repeat(2, 1fr); gap: 16px; }
+    .signals-grid { grid-template-columns: 1fr; }
+    .pricing-row { grid-template-columns: 1fr; }
+    .roadmap-row { grid-template-columns: 1fr; }
+
+    .compare-row {
+      grid-template-columns: 1fr;
+      gap: 0;
+      border-radius: 16px;
+      overflow: hidden;
+      margin-bottom: 12px;
+    }
+    .compare-row.header { display: none; }
+    .compare-row:not(.header) > div {
+      padding: 12px 16px;
+    }
+    .compare-row:not(.header) > div:first-child {
+      border-radius: 16px 16px 0 0;
+    }
+    .compare-row:not(.header) > div:nth-child(2)::before {
+      content: '行业主流：';
+      font-weight: 600;
+      color: var(--text-tertiary);
+      font-size: 12px;
+      display: block;
+      margin-bottom: 2px;
+    }
+    .compare-row:not(.header) > div:nth-child(3)::before {
+      content: '黄小璨已落地：';
+      font-weight: 600;
+      color: var(--gold-deep);
+      font-size: 12px;
+      display: block;
+      margin-bottom: 2px;
+    }
+    .compare-row:not(.header) > div:last-child {
+      border-radius: 0 0 16px 16px;
+    }
+
+    .arch-flow-modern { flex-direction: column; align-items: center; gap: 0; }
+    .arch-connector { width: 48px; height: 48px; transform: rotate(90deg); }
+    .arch-block { max-width: 100%; transform: none !important; }
+
+    .bar-row-modern { grid-template-columns: 80px 1fr 50px; gap: 10px; }
+    .bar-row-modern .bar-label { font-size: 12px; }
+
+    .price-card { padding: 32px 24px; }
+    .price-amount { font-size: 36px; }
+
+    .tl-item { padding: 24px; margin-bottom: 32px; }
+    .tl-title { font-size: 18px; }
+    .tl-desc { font-size: 15px; }
+  }
+
+  @media (max-width: 480px) {
+    .hero h1 { font-size: 30px; }
+    .hero .subtitle { font-size: 16px; }
+    .hero-avatar { width: 96px; height: 96px; }
+    .section { padding: 60px 0; }
+    .section-title { font-size: 28px; }
+    .stat-block .number { font-size: 36px; }
+    .data-card .number { font-size: 34px; }
+    .data-card { padding: 24px 16px; }
+    .container { padding: 0 16px; }
+    .tl-item { margin-left: -16px; }
+    .timeline-modern { padding-left: 32px; }
+    .tl-item::before { left: -31px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════ HERO ═══════════ -->
+<section class="hero">
+  <div class="hero-content fade-up">
+    <img src="lao-huang-avatar.jpg" alt="黄有璨" class="hero-avatar">
+    <div class="hero-badge">INTERNAL REPORT</div>
+    <h1>黄小璨 AI<br><span class="gold">两周迭代总结</span></h1>
+    <p class="subtitle">私域智能化运营实践 · 产品里程碑 · 数据信号</p>
+    <div class="date-pill">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="3" width="14" height="12" rx="2" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"/><path d="M1 7h14" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"/><path d="M5 1v4M11 1v4" stroke="rgba(255,255,255,0.3)" stroke-width="1.5" stroke-linecap="round"/></svg>
+      2026.05.12 — 05.26
+    </div>
+  </div>
+  <div class="hero-scroll-hint">
+    <span>SCROLL</span>
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 4v12M5 11l5 5 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+  </div>
+</section>
+
+<!-- ═══════════ SECTION 1A: FDE 深度解读 ═══════════ -->
+<section class="section section-light" id="fde">
+  <div class="container">
+    <div class="fade-up">
+      <div class="section-label">Part 1</div>
+      <h2 class="section-title">FDE：AI 落地的关键角色</h2>
+      <p class="section-desc">2026 年 5 月，FDE 成为 AI 行业最热岗位。理解 FDE，就是理解 AI 商业化的下一个十年。</p>
+    </div>
+
+    <!-- FDE explainer -->
+    <div class="fde-explainer fade-up delay-1">
+      <h3 class="sub-title">什么是 FDE？</h3>
+      <div class="sub-desc">
+        <strong>FDE = Forward Deployed Engineer（前线部署工程师）</strong>，最早由美国大数据公司 Palantir 在 2010 年代创造。这些工程师不坐在总部写模型，而是<span class="accent">深入客户现场</span>，在真实业务环境中把 AI 能力「最后一公里」落地。他们兼具 CTO 级的全栈工程能力和深入理解业务的咨询能力——既能写生产级代码，又能帮客户定义问题。
+      </div>
+
+      <h3 class="sub-title">为什么 2026 年突然爆火？</h3>
+      <div class="sub-desc">
+        2025-2026 年，<strong>FDE 岗位数量增长了 42 倍</strong>，相关职位发布量同比增长 800%。两件标志性事件引爆了这个趋势：
+      </div>
+
+      <div class="fde-data-grid">
+        <div class="fde-data-card">
+          <div class="big-num">$100<span class="sm">亿</span></div>
+          <div class="data-label">OpenAI 成立 DeployCo<br>首轮融资超 $40 亿</div>
+        </div>
+        <div class="fde-data-card">
+          <div class="big-num">$15<span class="sm">亿</span></div>
+          <div class="data-label">Anthropic 联合高盛、黑石<br>成立企业 AI 服务合资公司</div>
+        </div>
+        <div class="fde-data-card">
+          <div class="big-num">800<span class="sm">%</span></div>
+          <div class="data-label">FDE 岗位发布量<br>同比增长</div>
+        </div>
+      </div>
+
+      <div class="sub-desc">
+        <strong>Google Cloud</strong> 也在 2026 年大规模招聘数百名 FDE，重点覆盖金融、医疗、零售和公共部门。上海已启动首期 FDE 专题培训班，计划建立超千人规模的 FDE 工程师储备库。
+      </div>
+
+      <div class="callout-modern">
+        <div class="callout-label">核心洞察</div>
+        <p>高达 <strong>90% 的 AI 模型从未走出试点阶段</strong>，65% 的企业 AI 部署处于停滞状态。2026 年的竞争焦点已从「谁的模型最强」转向「<strong>谁能规模化落地</strong>」。瓶颈不在模型能力，而在于数据架构碎片化、合规要求、与遗留系统集成、组织流程重新设计。</p>
+      </div>
+
+      <h3 class="sub-title" style="margin-top:48px;">FDE 与传统角色有什么不同？</h3>
+
+      <table class="fde-role-table">
+        <thead>
+          <tr>
+            <th>维度</th>
+            <th>售前方案工程师</th>
+            <th>客户成功经理</th>
+            <th>咨询顾问</th>
+            <th>FDE</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>介入时机</td>
+            <td>签约前</td>
+            <td>部署稳定后</td>
+            <td>项目制</td>
+            <td class="col-fde">签约后，深度嵌入</td>
+          </tr>
+          <tr>
+            <td>核心动作</td>
+            <td>演示、方案设计</td>
+            <td>指导、监控使用</td>
+            <td>出报告、给建议</td>
+            <td class="col-fde">写生产代码、搭系统</td>
+          </tr>
+          <tr>
+            <td>产品影响</td>
+            <td>无</td>
+            <td>反馈需求</td>
+            <td>无</td>
+            <td class="col-fde">将客户需求抽象为产品能力</td>
+          </tr>
+          <tr>
+            <td>一句话</td>
+            <td>帮你签单</td>
+            <td>帮你续约</td>
+            <td>帮你想清楚</td>
+            <td class="col-fde">帮你做出来并跑起来</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3 class="sub-title" style="margin-top:48px;">对创始人的行动启示</h3>
+
+      <div class="fde-takeaway-grid">
+        <div class="fde-takeaway">
+          <div class="num">1</div>
+          <h4>你需要会「部署」模型</h4>
+          <p>理解如何将现有 AI 能力嵌入你的业务流程，比追逐最新模型更有价值。模型是通用的，部署必须贴着具体场景做。</p>
+        </div>
+        <div class="fde-takeaway">
+          <div class="num">2</div>
+          <h4>FDE 思维可以内化</h4>
+          <p>即使不雇 FDE，用 FDE 的方法论——从业务痛点出发、在真实场景中迭代、将经验抽象为可复用资产——来构建你的 AI 产品。</p>
+        </div>
+        <div class="fde-takeaway">
+          <div class="num">3</div>
+          <h4>「最后一公里」是最大机会</h4>
+          <p>OpenAI 花 $40 亿、Anthropic 花 $15 亿来解决的问题，就是你的 AI 产品在解决的同一类问题：让 AI 在具体场景中真正跑起来。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ SECTION 1B: AI 时代 OPC/OPT 新范式 ═══════════ -->
+<section class="section" id="paradigm">
+  <div class="container">
+    <div class="fade-up">
+      <div class="section-label">Part 1.1</div>
+      <h2 class="section-title">AI 时代的 OPC / OPT 新范式</h2>
+      <p class="section-desc">我们正在探索的范式，本质上是 AI 时代的一人公司（OPC）和一人团队（OPT）。</p>
+    </div>
+
+    <!-- Formula -->
+    <div class="opc-formula fade-up delay-1">
+      <div class="formula-title">新范式公式</div>
+      <div class="formula-items">
+        <div class="f-item">
+          <div class="f-icon">👤</div>
+          <div class="f-text">1 个人</div>
+        </div>
+        <div class="f-plus">+</div>
+        <div class="f-item">
+          <div class="f-icon">🖥️</div>
+          <div class="f-text">AI 工作台</div>
+        </div>
+        <div class="f-plus">+</div>
+        <div class="f-item">
+          <div class="f-icon">🤖</div>
+          <div class="f-text">Agent ·<br>知识库 · 数据</div>
+        </div>
+        <div class="f-plus">+</div>
+        <div class="f-item">
+          <div class="f-icon">🤝</div>
+          <div class="f-text">1-2 人辅助</div>
+        </div>
+        <div class="f-equals">=</div>
+        <div class="f-result">
+          <div class="f-icon">🚀</div>
+          <div class="f-text">年收入千万到亿级业务</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Three systems -->
+    <div class="fade-up delay-2">
+      <h3 style="font-size:24px; font-weight:700; margin-bottom:12px; letter-spacing:-0.02em;">三个系统，一人搞定</h3>
+      <p style="font-size:17px; color:var(--text-secondary); margin-bottom:32px; max-width:640px; line-height:1.7;">在个人 IP 这件事上表现得尤为典型——一个人就能搞定内容创作、IP 账号运营、私域运营，以及产品的开发与迭代。当这三件事都通过「工作台 + AI 协作」稳固下来，就是 AI 时代 IP 业务的新范式。</p>
+    </div>
+
+    <div class="three-systems fade-up delay-2">
+      <div class="system-card">
+        <div class="sys-icon">📱</div>
+        <h4>内容营销智能化系统</h4>
+        <p>视频号、公众号、朋友圈——全渠道内容创作与分发，AI 辅助选题、生产、排期。</p>
+      </div>
+      <div class="system-card">
+        <div class="sys-icon">💬</div>
+        <h4>私域智能化运营系统</h4>
+        <p>企业微信、小程序、社群——用户从加入到深度服务，AI 驱动个性化陪伴与主动召回。</p>
+      </div>
+      <div class="system-card">
+        <div class="sys-icon">⚙️</div>
+        <h4>产品开发与迭代系统</h4>
+        <p>AI 辅助编码、测试、部署——产品从需求到上线的完整闭环，持续根据用户反馈迭代。</p>
+      </div>
+    </div>
+
+    <!-- Photo + Text paradigm -->
+    <div class="paradigm-split fade-up delay-3">
+      <div class="paradigm-photo">
+        <img src="huang.jpg" alt="黄有璨">
+        <div class="overlay">
+          <div class="name">黄有璨</div>
+          <div class="role">黄小璨 AI 创始人 · 认知维护者</div>
+        </div>
+      </div>
+      <div class="paradigm-text">
+        <h3>形象共存，<br>全渠道覆盖</h3>
+        <p>我和黄小璨一起，在对外形象展现和用户服务上同时露面——视频号、IP 账号、私域，黄小璨都会出现。</p>
+        <div class="highlight-quote">
+          黄小璨就是另一个 AI 版的我，但他又不是我。用户加进来之后都是跟黄小璨互动——无论企业微信、小程序还是我这一端，系统完全打通。
+        </div>
+        <p>我和团队伙伴在后端做维护和开发，让系统实现自动化和智能化，面向用户做更精细化的运营。未来把这套逻辑做明白之后，可以开源出来，帮助更多 IP 做业务的智能化改造。</p>
+      </div>
+    </div>
+
+    <!-- Architecture -->
+    <div class="arch-flow-modern fade-up delay-2">
+      <div class="arch-block human">
+        <div class="block-label">底层维护者</div>
+        <div class="block-name">老黄（人）</div>
+        <div class="block-desc">维护认知 · 知识库 · 方法论 · 机制设计</div>
+      </div>
+      <div class="arch-connector"><span>→</span></div>
+      <div class="arch-block ai">
+        <div class="block-label">AI 服务执行</div>
+        <div class="block-name">黄小璨 AI</div>
+        <div class="block-desc">7x24 交付 · 私教陪伴 · 功课 · Review</div>
+      </div>
+      <div class="arch-connector"><span>→</span></div>
+      <div class="arch-block users">
+        <div class="block-label">被服务对象</div>
+        <div class="block-name">1,225+ → 10 万用户</div>
+        <div class="block-desc">接收 AI 私教级个性化成长陪伴</div>
+      </div>
+    </div>
+
+    <!-- Compare -->
+    <div class="compare-grid fade-up delay-2">
+      <div class="compare-row header">
+        <div>维度</div>
+        <div>行业主流 2026 Q2</div>
+        <div>黄小璨已落地</div>
+      </div>
+      <div class="compare-row">
+        <div>AI 交付深度</div>
+        <div>问答 / 内容推荐 / 简单对话</div>
+        <div>30 天课题闭环 + 功课派发 + Review 飞轮</div>
+      </div>
+      <div class="compare-row">
+        <div>个性化</div>
+        <div>基于标签的粗分群</div>
+        <div>3 桶画像 + 跨 session 记忆 + 5 维评分动态切角色</div>
+      </div>
+      <div class="compare-row">
+        <div>方法论约束</div>
+        <div>LLM 自由发挥</div>
+        <div>27 个方法论文件强约束 + 3 层内容资产分层</div>
+      </div>
+      <div class="compare-row">
+        <div>商业模式</div>
+        <div>单一订阅</div>
+        <div>订阅 + 私教双轨分层</div>
+      </div>
+      <div class="compare-row">
+        <div>主动性</div>
+        <div>被动问答</div>
+        <div>AI 主动 push Review / 功课提醒 / 状态召回</div>
+      </div>
+    </div>
+
+    <div class="callout-modern fade-up delay-2">
+      <div class="callout-label">我们的实践</div>
+      <p>以黄小璨为例，目前已服务 <strong>1,000 多个用户</strong>，未来我们希望能够支撑起服务 <strong>10 万个用户</strong>的能力。这就是 AI 时代 IP 业务的新范式——不是一个人做所有的事，而是一个人配合 AI 系统，<strong>做所有人的事</strong>。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ SECTION 2: MILESTONES ═══════════ -->
+<section class="section" id="milestones">
+  <div class="container">
+    <div class="fade-up">
+      <div class="section-label">Part 2</div>
+      <h2 class="section-title">过去两周 · 七件大事</h2>
+      <p class="section-desc">从 v1.6 上线到 v1.7 重构启动，14 天密集迭代。</p>
+    </div>
+
+    <div class="stats-row fade-up delay-1">
+      <div class="stat-block">
+        <div class="number">70<span class="unit">+</span></div>
+        <div class="label">代码提交</div>
+      </div>
+      <div class="stat-block">
+        <div class="number">30<span class="unit">+</span></div>
+        <div class="label">修复 Bug</div>
+      </div>
+      <div class="stat-block">
+        <div class="number">200<span class="unit">+</span></div>
+        <div class="label">改动文件</div>
+      </div>
+      <div class="stat-block">
+        <div class="number">15<span class="unit">万字</span></div>
+        <div class="label">方法论资产</div>
+      </div>
+    </div>
+
+    <div class="timeline-modern fade-up delay-2">
+      <div class="tl-item">
+        <div class="tl-date">5/17 — 5/18</div>
+        <div class="tl-title">v1.6 正式上线</div>
+        <div class="tl-desc">产品从「能用」跨到「有架构」的关键版本。4 Tab 新架构上线，5 维评分 + 5 种角色模式启用，页面加载速度从 1-15 秒优化到 200ms（100x 提升），功课卡片到达率从 0% 提升到 95%+。</div>
+        <div class="tl-tags">
+          <span class="tl-tag">架构升级</span>
+          <span class="tl-tag">100x 速度提升</span>
+          <span class="tl-tag">95%+ 卡片到达</span>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-date">5/12 — 5/16</div>
+        <div class="tl-title">Token 成本治理取得实效</div>
+        <div class="tl-desc">Token Slim 全量推开，input token 节省 57.9%，年化节省 1,200+ 元。瘦身后 AI output 反而增加 47.5%——注意力更聚焦。用户体验零感知：0 投诉，每 session 消息数从 9.7 涨到 10.9。</div>
+        <div class="tl-tags">
+          <span class="tl-tag">节省 57.9%</span>
+          <span class="tl-tag">0 投诉</span>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-date">5/13 — 5/14</div>
+        <div class="tl-title">知识库 4 个月断流修复</div>
+        <div class="tl-desc">发现自 1 月以来知识库从未真正更新（代码 BUG + cron 双层失守），977 篇日课未入库。完成《一人公司 100 问》全量入库：1,328 个结构化知识点，业务类提问召回率达 77-93%。</div>
+        <div class="tl-tags">
+          <span class="tl-tag">1,328 知识点入库</span>
+          <span class="tl-tag">召回率 77-93%</span>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-date">5/22</div>
+        <div class="tl-title">P0 数据库事故与加固</div>
+        <div class="tl-desc">连接池参数改动引入事务泄露，prod 宕机 30+ 小时。修复后沉淀基础设施代码改动 Checklist（强制 2 人 review + ADR），新增 2 个监控脚本 + 2 个流程纪律。</div>
+        <div class="tl-tags">
+          <span class="tl-tag">事故复盘</span>
+          <span class="tl-tag">流程加固</span>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-date">5/23 — 5/25</div>
+        <div class="tl-title">v1.6.2 私教版完整编码</div>
+        <div class="tl-desc">两天半密集开发，27 个 commit 完成私教版核心差异化：quota 机制、成长地图路由抽屉、私教专属 banner、试婚期体验、Review 通知 cron。全版本通过 18 case 深度回归测试。</div>
+        <div class="tl-tags">
+          <span class="tl-tag">27 commits</span>
+          <span class="tl-tag">18 case 回归</span>
+          <span class="tl-tag">私教差异化</span>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-date">5/17 — 5/20</div>
+        <div class="tl-title">产品战略深度对齐</div>
+        <div class="tl-desc">拍板官方定位语「24 小时在线的、黄有璨级的 AI 私教」，确定商业承诺卖「陪伴提升拿结果的概率」。制定 M0 → M4 五阶段架构演进路线图。</div>
+        <div class="tl-tags">
+          <span class="tl-tag">战略对齐</span>
+          <span class="tl-tag">定位锁定</span>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-date">5/26</div>
+        <div class="tl-title">v1.7 Prompt 架构重构启动</div>
+        <div class="tl-desc">目标将首轮 prompt 从 43K → 12K chars（-70%），解决首轮 8-15 秒响应。4 层架构分离（信念 / 身份 / 方法论 / 路由）。W0.5 验证通过：真实用户 replay 实测 -71%，老黄味基本在线。</div>
+        <div class="tl-tags">
+          <span class="tl-tag">-70% prompt</span>
+          <span class="tl-tag">4 层架构</span>
+          <span class="tl-tag">W0.5 通过</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ SECTION 3: DATA ═══════════ -->
+<section class="section section-dark" id="data">
+  <div class="container">
+    <div class="fade-up">
+      <div class="section-label">Part 3</div>
+      <h2 class="section-title">数据信号</h2>
+      <p class="section-desc">核心指标呈现积极态势。以下是当前阶段最有价值的正向信号。</p>
+    </div>
+
+    <div class="data-hero-grid fade-up delay-1">
+      <div class="data-card">
+        <div class="number">1,225<span class="sm">+</span></div>
+        <div class="label">累计注册用户</div>
+      </div>
+      <div class="data-card">
+        <div class="number">624</div>
+        <div class="label">4 周活跃用户</div>
+      </div>
+      <div class="data-card">
+        <div class="number">~485</div>
+        <div class="label">付费订阅用户</div>
+      </div>
+      <div class="data-card">
+        <div class="number">~125</div>
+        <div class="label">私教版用户</div>
+      </div>
+    </div>
+
+    <div class="chart-section fade-up delay-2">
+      <div class="chart-title">用户活跃度分布（4 周窗口）</div>
+      <div class="bar-chart-modern">
+        <div class="bar-row-modern">
+          <div class="bar-label">≥10 条消息</div>
+          <div class="bar-track"><div class="bar-fill" style="width:100%">348</div></div>
+          <div class="bar-value">55.8%</div>
+        </div>
+        <div class="bar-row-modern">
+          <div class="bar-label">≥50 条消息</div>
+          <div class="bar-track"><div class="bar-fill" style="width:39.4%">137</div></div>
+          <div class="bar-value">22.0%</div>
+        </div>
+        <div class="bar-row-modern">
+          <div class="bar-label">≥100 条消息</div>
+          <div class="bar-track"><div class="bar-fill" style="width:20.7%">72</div></div>
+          <div class="bar-value">11.5%</div>
+        </div>
+        <div class="bar-row-modern">
+          <div class="bar-label">≥500 条消息</div>
+          <div class="bar-track"><div class="bar-fill" style="width:1.7%"></div></div>
+          <div class="bar-value">6 人</div>
+        </div>
+        <div class="bar-row-modern">
+          <div class="bar-label">≥1000 条</div>
+          <div class="bar-track"><div class="bar-fill" style="width:0.6%"></div></div>
+          <div class="bar-value">2 人</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="signals-grid fade-up delay-3">
+      <div class="signal-card">
+        <div class="signal-icon gold">📈</div>
+        <h4>用户投入度持续上升</h4>
+        <p>每 session 消息数从 9.7 涨到 10.9，Token Slim 瘦身期间用户反而聊得更多更深。</p>
+        <span class="metric">+12.4% 对话深度</span>
+      </div>
+      <div class="signal-card">
+        <div class="signal-icon green">🎯</div>
+        <h4>深度私教用户群体成型</h4>
+        <p>至少 25 位用户同时满足「14 天 ≥20 条 + 活跃课题 + 课题对话」三重条件，头部用户 14 天消息数达 898 / 443 / 1,206 条。</p>
+        <span class="metric">25+ 深度私教用户</span>
+      </div>
+      <div class="signal-card">
+        <div class="signal-icon gold">🔥</div>
+        <h4>超级用户涌现</h4>
+        <p>最活跃用户 4 周 1,134 条消息，100% 日活率，位列全站 0.32% 顶尖梯队。</p>
+        <span class="metric">100% 日活 · 0.32% 顶尖</span>
+      </div>
+      <div class="signal-card">
+        <div class="signal-icon blue">💰</div>
+        <h4>成本结构大幅优化</h4>
+        <p>Token Slim 全量后，input token 节省 57.9%，年化节省 1,200+ 元。AI output 反而增加 47.5%。</p>
+        <span class="metric">-57.9% 成本 · +47.5% 输出</span>
+      </div>
+      <div class="signal-card">
+        <div class="signal-icon green">📚</div>
+        <h4>知识库效能验证</h4>
+        <p>1,328 个知识点入库后，业务类提问 AI 召回新书稿占比 77-93%，知识资产开始产生实际价值。</p>
+        <span class="metric">77-93% 召回率</span>
+      </div>
+      <div class="signal-card">
+        <div class="signal-icon gold">🛡️</div>
+        <h4>产品稳定性达标</h4>
+        <p>v1.6 连续观测期：0 空回复异常 / 0 LLM 异常 / 0 用户投诉。13+ 位深度用户反馈全部闭环。</p>
+        <span class="metric">0 异常 · 12+ 反馈闭环</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ SECTION 3.1: PRICING ═══════════ -->
+<section class="section" id="pricing">
+  <div class="container">
+    <div class="fade-up">
+      <div class="section-label">Part 3.1</div>
+      <h2 class="section-title">商业模式</h2>
+      <p class="section-desc">订阅学习版与私教版的能力差异持续拉大。</p>
+    </div>
+
+    <div class="pricing-row fade-up delay-1">
+      <div class="price-card std">
+        <div class="price-badge">基础</div>
+        <div class="price-name">订阅学习版</div>
+        <div class="price-tagline">陪伴式个人成长 + 系统学习日课</div>
+        <div class="price-amount">¥9.9<span class="per"> / 首月</span></div>
+        <ul class="price-features">
+          <li>不限对话「聊聊」AI 成长陪伴</li>
+          <li>全部 200+ 篇老黄日课 + AI 讨论区</li>
+          <li>学习记录 + 关键词检索</li>
+        </ul>
+      </div>
+      <div class="price-card pro">
+        <div class="price-badge">已上线</div>
+        <div class="price-name">私教版</div>
+        <div class="price-tagline">深度梳理商业 / 人生卡点，推动事情发生</div>
+        <div class="price-amount">¥149<span class="per"> / 月</span></div>
+        <ul class="price-features">
+          <li>含订阅版全部能力</li>
+          <li>商业 / 教练深度咨询模式</li>
+          <li>主线课题锁定 + 专属功课派送</li>
+          <li>成长地图全功能（雷达图 / Review）</li>
+          <li>每周观察 + 主动召回</li>
+          <li>AI-Shifu 实战课会员</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ SECTION 4: ROADMAP ═══════════ -->
+<section class="section section-cream" id="roadmap">
+  <div class="container">
+    <div class="fade-up">
+      <div class="section-label">Part 4</div>
+      <h2 class="section-title">下一步方向</h2>
+    </div>
+
+    <div class="roadmap-row fade-up delay-1">
+      <div class="road-card">
+        <div class="phase">短期 · v1.7</div>
+        <h3>Prompt 架构重构</h3>
+        <ul>
+          <li>-70% prompt 体积，解决首轮响应慢</li>
+          <li>4 层架构分离落地</li>
+          <li>真实用户 side-by-side 对比验证</li>
+        </ul>
+      </div>
+      <div class="road-card">
+        <div class="phase">中期 · v1.6.2+</div>
+        <h3>数据基座 + 可视化</h3>
+        <ul>
+          <li>业务指标实时看板</li>
+          <li>成长地图 + 跨周期可视化</li>
+          <li>长期记忆增强</li>
+        </ul>
+      </div>
+      <div class="road-card">
+        <div class="phase">战略级</div>
+        <h3>规模化增长</h3>
+        <ul>
+          <li>老黄每周元方法论标注</li>
+          <li>M0 → M1（200-500 付费）</li>
+          <li>订阅 vs 私教差异感拉大</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ FOOTER ═══════════ -->
+<footer class="footer">
+  <div class="footer-brand">黄小璨 AI</div>
+  <div class="footer-divider"></div>
+  <p class="footer-text">内部运营报告 · 2026-05-26</p>
+  <p class="footer-text" style="margin-top:6px; font-size:12px; opacity:0.5;">CONFIDENTIAL</p>
+</footer>
+
+</body>
+</html>
